@@ -1,57 +1,26 @@
 "use client";
 
-import { ethers } from "ethers";
-import { useEffect, useRef, useState } from "react";
+import { useFetchEthereum } from "@/lib/hooks/useFetchEthereum";
+import { useFetchUSDC } from "@/lib/hooks/useFetchUSDC";
+import { useFetchUSDT } from "@/lib/hooks/useFetchUSDT";
+import { useState } from "react";
+import { useDebounce } from "use-debounce";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-
-const USDC_READ_PROXY_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; // https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
-const USDT_READ_PROXY_ADDRESS = "0xdac17f958d2ee523a2206206994597c13d831ec7"; // https://etherscan.io/token/0xdac17f958d2ee523a2206206994597c13d831ec7
+import { Skeleton } from "./ui/skeleton";
 
 const WalletDisplay = () => {
-  const [balance, setBalance] = useState<{
-    eth: string;
-    usdc: string;
-    usdt: string;
-  }>({ eth: "", usdc: "", usdt: "" });
   const [address, setAddress] = useState(
     "0xF977814e90dA44bFA03b6295A0616a897441aceC"
   );
-  const providerRef = useRef(
-    window.ethereum ? new ethers.BrowserProvider(window.ethereum) : undefined
-  );
+  const [addressDebounce] = useDebounce(address, 300);
 
-  useEffect(() => {
-    const getAddressBalance = async () => {
-      if (!providerRef.current) return;
-
-      try {
-        const usdcContract = new ethers.Contract(
-          USDC_READ_PROXY_ADDRESS,
-          ["function balanceOf(address) view returns (uint256)"],
-          providerRef.current
-        );
-        const usdtContract = new ethers.Contract(
-          USDT_READ_PROXY_ADDRESS,
-          ["function balanceOf(address) view returns (uint256)"],
-          providerRef.current
-        );
-
-        const eth = await providerRef.current.getBalance(address);
-        const usdc = await usdcContract.balanceOf(address);
-        const usdt = await usdtContract.balanceOf(address);
-
-        setBalance({
-          eth: ethers.formatEther(eth),
-          usdc: ethers.formatUnits(usdc, 6),
-          usdt: ethers.formatUnits(usdt, 6),
-        });
-      } catch (error) {
-        setBalance({ eth: "", usdc: "", usdt: "" });
-      }
-    };
-    getAddressBalance();
-  }, [address]);
+  const { data: eth, isLoading: isLoadingETH } =
+    useFetchEthereum(addressDebounce);
+  const { data: usdc, isLoading: isLoadingUSDC } =
+    useFetchUSDC(addressDebounce);
+  const { data: usdt, isLoading: isLoadingUSDT } =
+    useFetchUSDT(addressDebounce);
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -59,14 +28,46 @@ const WalletDisplay = () => {
         <Label>Address</Label>
         <Input value={address} onChange={(e) => setAddress(e.target.value)} />
       </div>
-      <Label>Balance</Label>
-      <ul className="list-disc pl-4">
-        <li>{balance.eth} ETH</li>
-        <li>{balance.usdc} USDC</li>
-        <li>{balance.usdt} USDT</li>
-      </ul>
+      <div>
+        <Label>Balance</Label>
+        <ul className="list-disc pl-4">
+          <TokenDisplay isLoading={isLoadingETH} unit="ETH" balance={eth} />
+          <TokenDisplay isLoading={isLoadingUSDC} unit="USDC" balance={usdc} />
+          <TokenDisplay isLoading={isLoadingUSDT} unit="USDT" balance={usdt} />
+        </ul>
+      </div>
     </div>
   );
 };
 
 export default WalletDisplay;
+
+const TokenDisplay = ({
+  isLoading,
+  unit,
+  balance,
+}: {
+  isLoading: boolean;
+  unit: string;
+  balance: string | undefined;
+}) => {
+  if (isLoading) {
+    return (
+      <li>
+        <div className="flex items-center gap-2">
+          {unit}: <Skeleton className="w-12 h-4" />
+        </div>
+      </li>
+    );
+  }
+
+  if (balance === undefined) {
+    return <li>{unit}: Error</li>;
+  }
+
+  return (
+    <li>
+      {unit}: ${balance}
+    </li>
+  );
+};
