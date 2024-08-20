@@ -9,9 +9,7 @@ export async function GET(request: NextRequest) {
       throw new Error("Address is required");
     }
 
-    const provider = new ethers.JsonRpcProvider(
-      `https://mainnet.infura.io/v3/${process.env.INFURA_ID}`
-    );
+    const provider = new ethers.JsonRpcProvider(process.env.INFURA_ENDPOINT);
 
     const usdtContract = new ethers.Contract(
       "0xdac17f958d2ee523a2206206994597c13d831ec7",
