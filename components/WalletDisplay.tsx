@@ -8,6 +8,7 @@ import { useDebounce } from "use-debounce";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Skeleton } from "./ui/skeleton";
+import { Button } from "./ui/button";
 
 const WalletDisplay = () => {
   const [address, setAddress] = useState(
@@ -15,26 +16,61 @@ const WalletDisplay = () => {
   );
   const [addressDebounce] = useDebounce(address, 300);
 
-  const { data: eth, isLoading: isLoadingETH } =
-    useFetchEthereum(addressDebounce);
-  const { data: usdc, isLoading: isLoadingUSDC } =
-    useFetchUSDC(addressDebounce);
-  const { data: usdt, isLoading: isLoadingUSDT } =
-    useFetchUSDT(addressDebounce);
+  const {
+    data: eth,
+    isValidating: isValidatingETH,
+    mutate: mutateETH,
+  } = useFetchEthereum(addressDebounce);
+  const {
+    data: usdc,
+    isValidating: isValidatingUSDC,
+    mutate: mutateUSDC,
+  } = useFetchUSDC(addressDebounce);
+  const {
+    data: usdt,
+    isValidating: isValidatingUSDT,
+    mutate: mutateUSDT,
+  } = useFetchUSDT(addressDebounce);
 
   return (
     <div className="w-full flex flex-col gap-4">
       <h1 className="text-xl">Public Query</h1>
       <div>
         <Label>Address</Label>
-        <Input value={address} onChange={(e) => setAddress(e.target.value)} />
+        <div className="flex gap-4">
+          <Input
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="0x..."
+          />
+          <Button
+            onClick={() => {
+              mutateETH();
+              mutateUSDC();
+              mutateUSDT();
+            }}
+          >
+            Refetch{" "}
+            {isValidatingETH || isValidatingUSDC || isValidatingUSDT
+              ? "..."
+              : null}
+          </Button>
+        </div>
       </div>
       <div>
         <Label>Balance</Label>
         <ul className="list-disc pl-4">
-          <TokenDisplay isLoading={isLoadingETH} unit="ETH" balance={eth} />
-          <TokenDisplay isLoading={isLoadingUSDC} unit="USDC" balance={usdc} />
-          <TokenDisplay isLoading={isLoadingUSDT} unit="USDT" balance={usdt} />
+          <TokenDisplay isLoading={isValidatingETH} unit="ETH" balance={eth} />
+          <TokenDisplay
+            isLoading={isValidatingUSDC}
+            unit="USDC"
+            balance={usdc}
+          />
+          <TokenDisplay
+            isLoading={isValidatingUSDT}
+            unit="USDT"
+            balance={usdt}
+          />
         </ul>
       </div>
     </div>
