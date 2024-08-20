@@ -24,6 +24,7 @@ const WalletDisplay = () => {
 
   return (
     <div className="w-full flex flex-col gap-4">
+      <h1 className="text-xl">Public Query</h1>
       <div>
         <Label>Address</Label>
         <Input value={address} onChange={(e) => setAddress(e.target.value)} />
