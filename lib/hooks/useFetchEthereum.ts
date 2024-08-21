@@ -1,10 +1,15 @@
 import axios from "axios";
 import queryString from "query-string";
 import useSWR from "swr";
+import { ProviderType } from "../ProviderType";
 
-export const useFetchEthereum = (address?: string) => {
+export const useFetchEthereum = (options: {
+  address?: string;
+  providerType?: ProviderType;
+}) => {
   return useSWR<string, Error>(
-    address ? [`/api/token/eth?${queryString.stringify({ address })}`] : null,
-    async ([url]) => (await axios.get(url)).data
+    options.address ? [`/api/token/eth`, options] : null,
+    async ([url]) =>
+      (await axios.get(`${url}?${queryString.stringify(options)}`)).data
   );
 };
