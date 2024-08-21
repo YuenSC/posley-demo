@@ -84,7 +84,7 @@ const WalletTransaction = () => {
   };
 
   return (
-    <form className="w-full flex flex-col gap-2" action={action}>
+    <form className="w-full flex flex-col gap-4" action={action}>
       <h1 className="text-2xl">ETH Transaction in Linea Sepolia</h1>
 
       <Collapsible>
@@ -120,44 +120,49 @@ const WalletTransaction = () => {
         </CollapsibleContent>
       </Collapsible>
 
-      <div>
-        <Label className="text-base font-normal">Sender Private Key</Label>
-        <Input
-          name="privateKey"
-          placeholder="0x..."
-          required
-          value={privateKey}
-          onChange={(e) => setPrivateKey(e.target.value)}
-        />
+      <div className="flex flex-col gap-2">
+        <div>
+          <Label className="text-base font-normal">Sender Private Key</Label>
+          <Input
+            name="privateKey"
+            placeholder="0x..."
+            required
+            value={privateKey}
+            onChange={(e) => setPrivateKey(e.target.value)}
+          />
+        </div>
+        <WalletDisplay title="Sender Wallet Detail" address={wallet?.address} />
       </div>
 
-      <WalletDisplay title="Sender Wallet Detail" address={wallet?.address} />
-
-      <div className="flex items-center gap-2">
-        <span>You will transfer</span>
-        <Input
-          placeholder="0.0"
-          type="number"
-          className="w-20"
-          name="amount"
-          max={data ? parseFloat(data) : undefined}
-          min={0}
-          step={0.01}
-          required
-          defaultValue={0.01}
-        />
-        <span>ETH to</span>
-        <Input
-          placeholder="0x..."
-          className="flex-1"
-          name="receiverAddress"
-          required
-          value={receiverAddress}
-          onChange={(e) => setReceiverAddress(e.target.value)}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <span>You will transfer</span>
+          <Input
+            placeholder="0.0"
+            type="number"
+            className="w-20"
+            name="amount"
+            max={data ? parseFloat(data) : undefined}
+            min={0}
+            step={0.01}
+            required
+            defaultValue={0.01}
+          />
+          <span>ETH to</span>
+          <Input
+            placeholder="0x..."
+            className="flex-1"
+            name="receiverAddress"
+            required
+            value={receiverAddress}
+            onChange={(e) => setReceiverAddress(e.target.value)}
+          />
+        </div>
+        <WalletDisplay
+          title="Receiver Wallet Detail"
+          address={receiverAddress}
         />
       </div>
-
-      <WalletDisplay title="Receiver Wallet Detail" address={receiverAddress} />
 
       {error ? <div className="text-red-500 -mt-2">{error}</div> : null}
 
