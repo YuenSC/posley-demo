@@ -59,7 +59,7 @@ const BalanceDisplay = () => {
       </div>
       <div>
         <Label>Balance</Label>
-        <ul className="list-disc pl-4">
+        <ul className="list-disc pl-4 ">
           <li>
             <TokenDisplay
               isLoading={isValidatingETH}

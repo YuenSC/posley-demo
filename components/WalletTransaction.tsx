@@ -122,7 +122,7 @@ const WalletTransaction = () => {
 
       <div className="flex flex-col gap-2">
         <div>
-          <Label className="text-base font-normal">Sender Private Key</Label>
+          <Label>Sender Private Key</Label>
           <Input
             name="privateKey"
             placeholder="0x..."
