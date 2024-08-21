@@ -4,8 +4,22 @@ import { z } from "zod";
 import { ethers } from "ethers";
 
 const schema = z.object({
-  privateKey: z.string(),
-  receiverAddress: z.string(),
+  privateKey: z.string().refine(
+    (key) => {
+      try {
+        new ethers.Wallet(key);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    {
+      message: "Invalid Ethereum private key",
+    }
+  ),
+  receiverAddress: z.string().refine((address) => ethers.isAddress(address), {
+    message: "Invalid Ethereum address",
+  }),
   amount: z.number(),
 });
 
@@ -29,7 +43,7 @@ export const createLineaTransaction = async (formData: FormData) => {
     await wallet.sendTransaction(tx);
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return { error: "Invalid form data" };
+      return { error: "Invalid Form Data" };
     }
 
     return { error: error.message as string };

@@ -9,12 +9,16 @@ import TokenDisplay from "./TokenDisplay";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { ethers } from "ethers";
 
 const BalanceDisplay = () => {
   const [address, setAddress] = useState(
     "0xF977814e90dA44bFA03b6295A0616a897441aceC"
   );
-  const [addressDebounce] = useDebounce(address, 300);
+  const [addressDebounce] = useDebounce(
+    ethers.isAddress(address) ? address : "",
+    300
+  );
 
   const {
     data: eth,
