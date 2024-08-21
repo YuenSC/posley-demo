@@ -11,6 +11,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import TokenDisplay from "./TokenDisplay";
 import { useSWRConfig } from "swr";
+import { Button } from "./ui/button";
 
 const DefaultSenderPrivateKey =
   "bea70301d065cf7946f25251c73dbfff93d4320715e43bdc0d5087553074cb64";
@@ -45,16 +46,17 @@ const WalletTransaction = () => {
       return result.error;
     }
 
-    // await 0.5s
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    mutate([
-      "/api/token/eth",
-      { address: wallet?.address, providerType: ProviderType.linea },
-    ]);
-    mutate([
-      "/api/token/eth",
-      { address: receiverAddress, providerType: ProviderType.linea },
-    ]);
+    //TODO: It seems immediate fetch will still get the old data
+    setTimeout(() => {
+      mutate([
+        "/api/token/eth",
+        { address: wallet?.address, providerType: ProviderType.linea },
+      ]);
+      mutate([
+        "/api/token/eth",
+        { address: receiverAddress, providerType: ProviderType.linea },
+      ]);
+    }, 1000);
   };
   const [error, action] = useFormState(createTransaction, undefined);
 
@@ -62,6 +64,11 @@ const WalletTransaction = () => {
     address: wallet?.address,
     providerType: ProviderType.linea,
   });
+
+  const handleSetData = (senderKey: string, receiverAddress: string) => {
+    setPrivateKey(senderKey);
+    setReceiverAddress(receiverAddress);
+  };
 
   return (
     <form className="w-full flex flex-col gap-2" action={action}>
@@ -71,6 +78,21 @@ const WalletTransaction = () => {
         <div>Testing Sender Address - {DefaultSenderAddress}</div>
         <div>Testing Receiver Private Key - {DefaultReceiverPrivateKey}</div>
         <div>Testing Receiver Address - {DefaultReceiverAddress}</div>
+      </div>
+
+      <div className="flex gap-4">
+        <Button
+          onClick={(e) => {
+            e.preventDefault();
+            handleSetData(DefaultSenderPrivateKey, DefaultReceiverAddress);
+          }}
+        >{`Sender -> Receiver`}</Button>
+        <Button
+          onClick={(e) => {
+            e.preventDefault();
+            handleSetData(DefaultReceiverPrivateKey, DefaultSenderAddress);
+          }}
+        >{`Receiver -> Sender`}</Button>
       </div>
 
       <div>

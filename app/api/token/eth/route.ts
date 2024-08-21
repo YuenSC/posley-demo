@@ -17,7 +17,6 @@ export async function GET(request: NextRequest) {
 
     const provider = new ethers.JsonRpcProvider(providerUrl);
 
-    const network = await provider.getNetwork();
     const eth = await provider.getBalance(address);
 
     return Response.json(ethers.formatEther(eth));
