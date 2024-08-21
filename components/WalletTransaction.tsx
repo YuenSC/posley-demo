@@ -1,20 +1,24 @@
 "use client";
 
 import { createLineaTransaction } from "@/app/actions";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { useFetchEthereum } from "@/lib/hooks/useFetchEthereum";
 import { ProviderType } from "@/lib/ProviderType";
 import { ethers } from "ethers";
 import { useMemo, useState } from "react";
 import { useFormState } from "react-dom";
+import { FaSpinner } from "react-icons/fa";
+import { IoMdSync } from "react-icons/io";
 import { useSWRConfig } from "swr";
 import SubmitButton from "./SubmitButton";
 import TokenDisplay from "./TokenDisplay";
 import { Button } from "./ui/button";
-import { IoMdSync } from "react-icons/io";
-
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { FaSpinner } from "react-icons/fa";
 import { useToast } from "./ui/use-toast";
 
 const DefaultSenderPrivateKey =
@@ -82,29 +86,39 @@ const WalletTransaction = () => {
   return (
     <form className="w-full flex flex-col gap-2" action={action}>
       <h1 className="text-2xl">ETH Transaction in Linea Sepolia</h1>
-      <div className="text-sm break-all">
-        <div>Testing Sender Private Key - {DefaultSenderPrivateKey}</div>
-        <div>Testing Sender Address - {DefaultSenderAddress}</div>
-        <div>Testing Receiver Private Key - {DefaultReceiverPrivateKey}</div>
-        <div>Testing Receiver Address - {DefaultReceiverAddress}</div>
-      </div>
 
-      <div className="flex gap-4">
-        <Button
-          variant="outline"
-          onClick={(e) => {
-            e.preventDefault();
-            handleSetData(DefaultSenderPrivateKey, DefaultReceiverAddress);
-          }}
-        >{`Sender -> Receiver`}</Button>
-        <Button
-          variant="outline"
-          onClick={(e) => {
-            e.preventDefault();
-            handleSetData(DefaultReceiverPrivateKey, DefaultSenderAddress);
-          }}
-        >{`Receiver -> Sender`}</Button>
-      </div>
+      <Collapsible>
+        <CollapsibleTrigger>
+          <span className="hover:underline">{`> Develope Testing Utils`}</span>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="text-sm break-all">
+            <div>Testing Sender Private Key - {DefaultSenderPrivateKey}</div>
+            <div>Testing Sender Address - {DefaultSenderAddress}</div>
+            <div>
+              Testing Receiver Private Key - {DefaultReceiverPrivateKey}
+            </div>
+            <div>Testing Receiver Address - {DefaultReceiverAddress}</div>
+          </div>
+
+          <div className="flex gap-4">
+            <Button
+              variant="outline"
+              onClick={(e) => {
+                e.preventDefault();
+                handleSetData(DefaultSenderPrivateKey, DefaultReceiverAddress);
+              }}
+            >{`Sender -> Receiver`}</Button>
+            <Button
+              variant="outline"
+              onClick={(e) => {
+                e.preventDefault();
+                handleSetData(DefaultReceiverPrivateKey, DefaultSenderAddress);
+              }}
+            >{`Receiver -> Sender`}</Button>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       <div>
         <Label className="text-base font-normal">Sender Private Key</Label>
