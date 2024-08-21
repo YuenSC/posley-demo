@@ -4,14 +4,18 @@ import { createLineaTransaction } from "@/app/actions";
 import { useFetchEthereum } from "@/lib/hooks/useFetchEthereum";
 import { ProviderType } from "@/lib/ProviderType";
 import { ethers } from "ethers";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useFormState } from "react-dom";
+import { useSWRConfig } from "swr";
 import SubmitButton from "./SubmitButton";
+import TokenDisplay from "./TokenDisplay";
+import { Button } from "./ui/button";
+import { IoMdSync } from "react-icons/io";
+
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import TokenDisplay from "./TokenDisplay";
-import { useSWRConfig } from "swr";
-import { Button } from "./ui/button";
+import { FaSpinner } from "react-icons/fa";
+import { useToast } from "./ui/use-toast";
 
 const DefaultSenderPrivateKey =
   "bea70301d065cf7946f25251c73dbfff93d4320715e43bdc0d5087553074cb64";
@@ -22,6 +26,7 @@ const DefaultReceiverAddress = "0x772D993986A422df48b5952214b0fe59BD082870";
 
 const WalletTransaction = () => {
   const { mutate } = useSWRConfig();
+  const { toast } = useToast();
 
   const [privateKey, setPrivateKey] = useState(DefaultSenderPrivateKey);
   const [receiverAddress, setReceiverAddress] = useState(
@@ -46,6 +51,10 @@ const WalletTransaction = () => {
       return result.error;
     }
 
+    toast({
+      title: "Transaction Success",
+      description: `Please note that the wallet balance may be not sync for a few seconds.`,
+    });
     //TODO: It seems immediate fetch will still get the old data
     setTimeout(() => {
       mutate([
@@ -56,7 +65,7 @@ const WalletTransaction = () => {
         "/api/token/eth",
         { address: receiverAddress, providerType: ProviderType.linea },
       ]);
-    }, 1000);
+    }, 2000);
   };
   const [error, action] = useFormState(createTransaction, undefined);
 
@@ -151,14 +160,31 @@ const WalletDisplay = ({
   address?: string;
 }) => {
   const validAddress = ethers.isAddress(address) ? address : "";
-  const { data, isValidating } = useFetchEthereum({
+  const { data, isValidating, mutate } = useFetchEthereum({
     address: validAddress,
     providerType: ProviderType.linea,
   });
 
   return (
     <div className="border p-2 rounded-md text-xs">
-      <h2>{title}</h2>
+      <div className="flex justify-between">
+        <h2>{title}</h2>
+        <Button
+          variant={"outline"}
+          size={"icon"}
+          className="h-5 w-5"
+          onClick={(e) => {
+            e.preventDefault();
+            mutate();
+          }}
+        >
+          {isValidating ? (
+            <FaSpinner className="animate-spin " />
+          ) : (
+            <IoMdSync />
+          )}
+        </Button>
+      </div>
       <div className="break-all">
         Your wallet address: {validAddress || "Unknown"}
       </div>
