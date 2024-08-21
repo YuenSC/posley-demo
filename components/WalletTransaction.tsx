@@ -81,7 +81,7 @@ const WalletTransaction = () => {
 
   return (
     <form className="w-full flex flex-col gap-2" action={action}>
-      <h1 className="text-lg">ETH Transaction in Linea Sepolia</h1>
+      <h1 className="text-2xl">ETH Transaction in Linea Sepolia</h1>
       <div className="text-sm break-all">
         <div>Testing Sender Private Key - {DefaultSenderPrivateKey}</div>
         <div>Testing Sender Address - {DefaultSenderAddress}</div>
@@ -91,12 +91,14 @@ const WalletTransaction = () => {
 
       <div className="flex gap-4">
         <Button
+          variant="outline"
           onClick={(e) => {
             e.preventDefault();
             handleSetData(DefaultSenderPrivateKey, DefaultReceiverAddress);
           }}
         >{`Sender -> Receiver`}</Button>
         <Button
+          variant="outline"
           onClick={(e) => {
             e.preventDefault();
             handleSetData(DefaultReceiverPrivateKey, DefaultSenderAddress);
